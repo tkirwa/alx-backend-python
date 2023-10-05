@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Defines annotated variables"""
 
 # Integer variable 'a' with a value of 1
 a: int = 1
