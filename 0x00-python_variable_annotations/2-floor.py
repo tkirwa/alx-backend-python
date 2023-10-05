@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-
-import math  # Import the math module to use math.floor
+"""Type-annotated function floor"""
 
 
 def floor(n: float) -> int:
@@ -13,4 +12,6 @@ def floor(n: float) -> int:
     Returns:
         int: The floor of the input number as an integer.
     """
-    return math.floor(n)
+    # Convert the float to an integer to get the floor value
+    result = int(n)
+    return result
