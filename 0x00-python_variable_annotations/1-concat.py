@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Type-annotated function concat"""
+
 
 def concat(str1: str, str2: str) -> str:
     """
@@ -11,4 +13,6 @@ def concat(str1: str, str2: str) -> str:
     Returns:
         str: The concatenated string.
     """
-    return str1 + str2
+    # Concatenate the two input strings
+    result = str1 + str2
+    return result
