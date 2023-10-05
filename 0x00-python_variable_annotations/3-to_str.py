@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Type-annotated function to_str"""
+
 
 def to_str(n: float) -> str:
     """
@@ -10,4 +12,6 @@ def to_str(n: float) -> str:
     Returns:
         str: The string representation of the input number.
     """
-    return str(n)
+    # Convert the float to a string using the str() function
+    result = str(n)
+    return result
