@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
+"""Defines a function to safely retrieve the first element of a sequence"""
 
-from typing import Any, List, Sequence, Union, Optional
+from typing import Any, Sequence, Union
 
 
 def safe_first_element(lst: Sequence[Any]) -> Union[Any, None]:
     """
-    Returns the first element of a sequence or None if the sequence is empty.
+    Returns the first element of a sequence if it exists,
+    otherwise returns None.
 
-    Args:
-        lst (Sequence[Any]): The input sequence.
-
-    Returns:
-        Union[Any, None]: The first element of the sequence or None.
+    :param lst: The input sequence.
+    :return: The first element of the sequence or None if the
+    sequence is empty.
     """
     if lst:
         return lst[0]
