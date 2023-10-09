@@ -29,15 +29,3 @@ async def wait_n(n: int, max_delay: int) -> List[float]:
     # Extract the result from each task (delays) and return them in ascending
     #  order
     return [task.result() for task in tasks]
-
-if __name__ == "__main__":
-    # Test the wait_n routine
-    loop = asyncio.get_event_loop()
-    delays = loop.run_until_complete(wait_n(5, 5))
-    print(delays)
-
-    delays = loop.run_until_complete(wait_n(10, 7))
-    print(delays)
-
-    delays = loop.run_until_complete(wait_n(10, 0))
-    print(delays)
