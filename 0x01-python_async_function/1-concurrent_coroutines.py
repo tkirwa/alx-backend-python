@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" The basics of async """
+""" Execute multiple coroutines at the same time with async """
 
 import asyncio
 from typing import List
