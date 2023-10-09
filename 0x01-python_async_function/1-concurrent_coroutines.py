@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
+""" The basics of async """
 
 import asyncio
+from typing import List
+
+# Import the wait_random coroutine from the previous file
 wait_random = __import__('0-basic_async_syntax').wait_random
 
 
-async def wait_n(n: int, max_delay: int) -> list[float]:
+async def wait_n(n: int, max_delay: int) -> List[float]:
     """
     Asynchronous routine that spawns wait_random n times with the specified
       max_delay.
@@ -14,18 +18,26 @@ async def wait_n(n: int, max_delay: int) -> list[float]:
         max_delay (int): The maximum delay in seconds.
 
     Returns:
-        list[float]: A list of delays in ascending order.
+        List[float]: A list of delays in ascending order.
     """
-    delays = []
-
-    async def execute_wait_random():
-        delay = await wait_random(max_delay)
-        delays.append(delay)
-
     # Create a list of tasks to execute wait_random concurrently
-    tasks = [execute_wait_random() for _ in range(n)]
+    tasks = [asyncio.create_task(wait_random(max_delay)) for _ in range(n)]
 
-    # Run the tasks concurrently
+    # Use asyncio.gather to run the tasks concurrently
     await asyncio.gather(*tasks)
 
-    return sorted(delays)
+    # Extract the result from each task (delays) and return them in ascending
+    #  order
+    return [task.result() for task in tasks]
+
+if __name__ == "__main__":
+    # Test the wait_n routine
+    loop = asyncio.get_event_loop()
+    delays = loop.run_until_complete(wait_n(5, 5))
+    print(delays)
+
+    delays = loop.run_until_complete(wait_n(10, 7))
+    print(delays)
+
+    delays = loop.run_until_complete(wait_n(10, 0))
+    print(delays)
