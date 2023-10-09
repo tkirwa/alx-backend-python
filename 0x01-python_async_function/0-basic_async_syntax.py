@@ -17,9 +17,3 @@ async def wait_random(max_delay=10):
     random_delay = random.uniform(0, max_delay)
     await asyncio.sleep(random_delay)
     return random_delay
-
-# The following code demonstrates how to use the wait_random coroutine.
-if __name__ == "__main__":
-    print(asyncio.run(wait_random()))
-    print(asyncio.run(wait_random(5)))
-    print(asyncio.run(wait_random(15)))
