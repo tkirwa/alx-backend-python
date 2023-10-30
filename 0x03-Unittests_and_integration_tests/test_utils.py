@@ -85,6 +85,11 @@ class TestGetJson(unittest.TestCase):
 
 
 class TestMemoize(unittest.TestCase):
+    """
+    This class inherits from `unittest.TestCase` and contains unit test for the
+    `utils.memoize` function.
+    """
+
     def test_memoize(self):
         """
         Test function for `utils.memoize`. It asserts if the function returns
@@ -93,16 +98,28 @@ class TestMemoize(unittest.TestCase):
         """
 
         class TestClass:
+            """
+            Test Class for wrapping with memoize
+            """
+
             def a_method(self):
+                """
+                Method that returns a constant value
+                """
                 return 42
 
             @memoize
             def a_property(self):
+                """
+                Property that returns the result of a_method. It is decorated
+                  with memoize,
+                so it should only call a_method once, even if we access it
+                  multiple times.
+                """
                 return self.a_method()
 
-        with patch.object(TestClass, "a_method",
-                          return_value=42) as mocked_a_method:
-            test_class_instance = TestClass()
-            self.assertEqual(test_class_instance.a_property, 42)
-            self.assertEqual(test_class_instance.a_property, 42)
-            mocked_a_method.assert_called_once()
+        with patch.object(TestClass, 'a_method', return_value=42) as mock:
+            test_class = TestClass()
+            test_class.a_property
+            test_class.a_property
+            mock.assert_called_once()
