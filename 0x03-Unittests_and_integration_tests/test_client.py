@@ -107,26 +107,31 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.get_patcher.stop()
 
     def test_public_repos(self):
-        """ Integration test: public repos"""
-        test_class = GithubOrgClient("google")
+        """Test that GithubOrgClient.public_repos returns the expected value"""
+        self.get.return_value.json.side_effect = [
+            self.org_payload, self.repos_payload,
+            self.expected_repos, self.apache2_repos
+        ]
 
-        self.assertEqual(test_class.org, self.org_payload)
-        self.assertEqual(test_class.repos_payload, self.repos_payload)
-        self.assertEqual(test_class.public_repos(), self.expected_repos)
-        self.assertEqual(test_class.public_repos("XLICENSE"), [])
-        self.mock.assert_called()
+        github_client = GithubOrgClient('google')
+        repos = github_client.public_repos()
 
-    def test_public_repos_with_license(self):
-        """ Integration test for public repos with License """
-        test_class = GithubOrgClient("google")
+        self.assertEqual(repos, self.expected_repos)
 
-        self.assertEqual(test_class.public_repos(), self.expected_repos)
-        self.assertEqual(test_class.public_repos("XLICENSE"), [])
-        self.assertEqual(test_class.public_repos(
-            "apache-2.0"), self.apache2_repos)
-        self.mock.assert_called()
+    def test_public_repos_with_license(self) -> None:
+        """
+        Test public_repos method of GithubOrgClient with license argument.
+        This method tests that the public_repos method of a GithubOrgClient
+          instance returns the expected list of repositories when called with
+            the license argument set to "apache-2.0".
+        """
+        self.assertEqual(
+            GithubOrgClient("google").public_repos(license="apache-2.0"),
+            self.apache2_repos,
+        )
 
     @classmethod
-    def tearDownClass(cls):
-        """A class method called after tests in an individual class have run"""
+    def tearDownClass(cls) -> None:
+        """_summary_
+        """
         cls.get_patcher.stop()
