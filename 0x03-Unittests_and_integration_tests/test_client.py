@@ -51,12 +51,18 @@ class TestGithubOrgClient(unittest.TestCase):
         is called only once.
         """
 
-        mock_public_repos_url.return_value = "https://api.github.com/orgs"
-        "/test/repos"
+        json_payload = [{"name": "Google"}, {"name": "Twitter"}]
+        mock_json.return_value = json_payload
 
-        test_class_instance = GithubOrgClient("test")
-        self.assertEqual(test_class_instance.public_repos(),
-                         ["repo1", "repo2"])
+        with patch('client.GithubOrgClient._public_repos_url',
+                   new_callable=PropertyMock) as mock_public:
 
-        mock_get_json.assert_called_once()
-        mock_public_repos_url.assert_called_once()
+            mock_public.return_value = "hello/world"
+            test_class = GithubOrgClient('test')
+            result = test_class.public_repos()
+
+            check = [i["name"] for i in json_payload]
+            self.assertEqual(result, check)
+
+            mock_public.assert_called_once()
+            mock_json.assert_called_once()
