@@ -37,6 +37,10 @@ class TestAccessNestedMap(unittest.TestCase):
                          expected_output)
 
 
+@parameterized.expand([
+    ({}, ("a",)),
+    ({"a": 1}, ("a", "b"))
+])
 def test_access_nested_map_exception(self, nested_map, path):
     """
     Test function for `utils.access_nested_map`. It asserts if the function
