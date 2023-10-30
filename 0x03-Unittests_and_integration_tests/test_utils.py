@@ -35,3 +35,20 @@ class TestAccessNestedMap(unittest.TestCase):
         """
         self.assertEqual(utils.access_nested_map(nested_map, path),
                          expected_output)
+
+
+def test_access_nested_map_exception(self, nested_map, path):
+    """
+    Test function for `utils.access_nested_map`. It asserts if the function
+      raises a
+    KeyError with expected message for given inputs. The test cases are
+      provided by the
+    `parameterized.expand` decorator.
+
+    Args:
+        nested_map (dict): The nested map to be tested.
+        path (tuple): The path to the value in the map.
+    """
+    with self.assertRaises(KeyError) as cm:
+        utils.access_nested_map(nested_map, path)
+    self.assertEqual(cm.exception.args[0], path[-1])
