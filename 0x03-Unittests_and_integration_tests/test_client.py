@@ -39,9 +39,9 @@ class TestGithubOrgClient(unittest.TestCase):
             test_class_instance._public_repos_url, json_payload["repos_url"]
         )
 
-    @patch.object(GithubOrgClient, '_public_repos_url',
+    @patch.object(GithubOrgClient, "_public_repos_url",
                   new_callable=PropertyMock)
-    @patch('client.get_json', return_value=[{"name": "repo1"},
+    @patch("client.get_json", return_value=[{"name": "repo1"},
                                             {"name": "repo2"}])
     def test_public_repos(self, mock_get_json, mock_public_repos_url):
         """
@@ -60,3 +60,27 @@ class TestGithubOrgClient(unittest.TestCase):
 
         mock_get_json.assert_called_once()
         mock_public_repos_url.assert_called_once()
+
+    @parameterized.expand(
+        [
+            ({"license": {"key": "my_license"}}, "my_license", True),
+            ({"license": {"key": "other_license"}}, "my_license", False),
+        ]
+    )
+    def test_has_license(self, repo, license_key, has_license):
+        """
+        Test function for `GithubOrgClient.has_license`. It asserts if the
+          function returns
+        the expected output for given inputs.
+
+        Args:
+            repo (dict): A dictionary representing a repository with a license.
+            license_key (str): The key of the license to check for.
+            has_license (bool): Whether the repo is expected to have
+              the license.
+        """
+
+        test_class_instance = GithubOrgClient("test")
+        self.assertEqual(
+            test_class_instance.has_license(repo, license_key), has_license
+        )
