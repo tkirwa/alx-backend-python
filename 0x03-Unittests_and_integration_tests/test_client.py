@@ -125,12 +125,13 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
           instance returns the expected list of repositories when called with
             the license argument set to "apache-2.0".
         """
-        self.get.return_value.json.side_effect = [
-            self.org_payload, self.repos_payload,
-            self.expected_repos, self.apache2_repos
-        ]
+        self.assertEqual(
+            GithubOrgClient("google").public_repos(license="apache-2.0"),
+            self.apache2_repos,
+        )
 
-        github_client = GithubOrgClient('google')
-        repos = github_client.public_repos(license="apache-2.0")
-
-        self.assertEqual(repos, self.apache2_repos)
+    @classmethod
+    def tearDownClass(cls) -> None:
+        """_summary_
+        """
+        cls.get_patcher.stop()
