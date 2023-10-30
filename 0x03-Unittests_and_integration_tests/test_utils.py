@@ -83,24 +83,29 @@ class TestGetJson(unittest.TestCase):
 
 
 class TestMemoize(unittest.TestCase):
-    def test_memoize(self):
-        """
-        Test function for `utils.memoize`. It asserts if the function returns
-        the expected output for given inputs and checks if the decorated method
-        is called only once.
-        """
 
+    def test_memoize(self):
+        # Define a class with a method and a memoized property
         class TestClass:
             def a_method(self):
                 return 42
 
-            @memoize
+            @utils.memoize
             def a_property(self):
                 return self.a_method()
 
-        with patch.object(TestClass, "a_method",
-                          return_value=42) as mocked_a_method:
-            test_class_instance = TestClass()
-            self.assertEqual(test_class_instance.a_property, 42)
-            self.assertEqual(test_class_instance.a_property, 42)
-            mocked_a_method.assert_called_once()
+        # Create an instance of TestClass
+        test_instance = TestClass()
+
+        # Use patch to mock the a_method
+        with patch.object(test_instance, 'a_method') as mock_a_method:
+            # Call a_property twice
+            result1 = test_instance.a_property()
+            result2 = test_instance.a_property()
+
+            # Assert that a_method is only called once
+            mock_a_method.assert_called_once()
+
+            # Assert that the results are correct
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
