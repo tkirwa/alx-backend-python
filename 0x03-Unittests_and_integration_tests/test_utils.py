@@ -5,6 +5,8 @@
 import unittest
 from parameterized import parameterized
 import utils
+import unittest
+from unittest.mock import patch, Mock
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -52,3 +54,28 @@ class TestAccessNestedMap(unittest.TestCase):
         with self.assertRaises(KeyError) as cm:
             utils.access_nested_map(nested_map, path)
         self.assertEqual(cm.exception.args[0], path[-1])
+
+
+class TestGetJson(unittest.TestCase):
+    @parameterized.expand(
+        [
+            ("http://example.com", {"payload": True}),
+            ("http://holberton.io", {"payload": False}),
+        ]
+    )
+    @patch("requests.get")
+    def test_get_json(self, test_url, test_payload, mock_get):
+        """
+        Test function for `utils.get_json`. It asserts if the function returns
+        the expected output for given inputs. The test cases are provided
+          by the
+        `parameterized.expand` decorator.
+
+        Args:
+            test_url (str): The URL that `get_json` will be called with.
+            test_payload (dict): The expected return value from `get_json`.
+            mock_get (Mock): The mock object for `requests.get`.
+        """
+        mock_get.return_value.json.return_value = test_payload
+        self.assertEqual(utils.get_json(test_url), test_payload)
+        mock_get.assert_called_once_with(test_url)
