@@ -39,8 +39,8 @@ class TestGithubOrgClient(unittest.TestCase):
             test_class_instance._public_repos_url, json_payload["repos_url"]
         )
 
-    @patch.object(GithubOrgClient, '_public_repos_url',
-                  new_callable=PropertyMock)
+    # @patch.object(GithubOrgClient, '_public_repos_url',
+    #               new_callable=PropertyMock)
     @patch('client.get_json', return_value=[{"name": "repo1"},
                                             {"name": "repo2"}])
     def test_public_repos(self, mock_get_json, mock_public_repos_url):
