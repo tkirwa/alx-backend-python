@@ -95,37 +95,25 @@ class TestGithubOrgClient(unittest.TestCase):
      "apache2_repos": fixtures.apache2_repos}
 ])
 class TestIntegrationGithubOrgClient(unittest.TestCase):
-    """Integration tests for GithubOrgClient"""
+    @classmethod
+    def setUpClass(cls):
+        """Set up for the tests"""
+        cls.get_patcher = patch('requests.get')
+        cls.get = cls.get_patcher.start()
 
     @classmethod
-    def setUpClass(cls) -> None:
-        """
-        Set up the test class. This method is called once for the entire
-          TestCase before any test methods are executed.
-        """
-        route_payload = {
-            'https://api.github.com/orgs/google': cls.org_payload,
-            'https://api.github.com/orgs/google/repos': cls.repos_payload,
-        }
+    def tearDownClass(cls):
+        """Teardown for the tests"""
+        cls.get_patcher.stop()
 
-        def get_payload(url):
-            """
-            Helper function to return payload for a given URL.
-            """
-            if url in route_payload:
-                return Mock(**{'json.return_value': route_payload[url]})
-            return HTTPError
+    def test_public_repos(self):
+        """Test that GithubOrgClient.public_repos returns the expected value"""
+        self.get.return_value.json.side_effect = [
+            self.org_payload, self.repos_payload,
+            self.expected_repos, self.apache2_repos
+        ]
 
-        cls.get_patcher = patch("requests.get", side_effect=get_payload)
-        cls.get_patcher.start()
+        github_client = GithubOrgClient('google')
+        repos = github_client.public_repos()
 
-    def test_public_repos(self) -> None:
-        """
-        Test public_repos method of GithubOrgClient. This method tests that
-          the public_repos method of a GithubOrgClient instance returns
-            the expected list of repositories.
-        """
-        self.assertEqual(
-            GithubOrgClient("google").public_repos(),
-            self.expected_repos,
-        )
+        self.assertEqual(repos, self.expected_repos)
