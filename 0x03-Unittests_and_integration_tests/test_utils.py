@@ -8,6 +8,7 @@ import utils
 import unittest
 from unittest.mock import patch, Mock
 from utils import memoize
+from client import GithubOrgClient
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -123,3 +124,22 @@ class TestMemoize(unittest.TestCase):
             test_class.a_property
             test_class.a_property
             mock.assert_called_once()
+
+
+class TestGithubOrgClient(unittest.TestCase):
+    @parameterized.expand([
+        ("google"),
+        ("abc")
+    ])
+    @patch('client.get_json', return_value={"payload": True})
+    def test_org(self, org_name, mock_get_json):
+        """
+        Test function for `GithubOrgClient.org`. It asserts if the function
+          returns
+        the expected output for given inputs and checks if the decorated method
+        is called only once.
+        """
+
+        test_class_instance = GithubOrgClient(org_name)
+        self.assertEqual(test_class_instance.org, {"payload": True})
+        mock_get_json.assert_called_once()
