@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Module for testing client """
+""" Module for testing GithubOrgClient """
 
 from client import GithubOrgClient
 from fixtures import TEST_PAYLOAD
@@ -10,45 +10,43 @@ from unittest.mock import patch, PropertyMock, Mock
 
 
 class TestGithubOrgClient(unittest.TestCase):
-    """ Class for Testing Github Org Client """
+    """Class for testing GithubOrgClient"""
 
-    @parameterized.expand([
-        ('google'),
-        ('abc')
-    ])
-    @patch('client.get_json')
+    @parameterized.expand([("google"), ("abc")])
+    @patch("client.get_json")
     def test_org(self, input, mock):
         """Test that GithubOrgClient.org returns the correct value"""
         test_class = GithubOrgClient(input)
         test_class.org()
-        mock.assert_called_once_with(f'https://api.github.com/orgs/{input}')
+        mock.assert_called_once_with(f"https://api.github.com/orgs/{input}")
 
     def test_public_repos_url(self):
-        """ Test that the result of _public_repos_url is the expected one
+        """Test that the result of _public_repos_url is the expected one
         based on the mocked payload
         """
-        with patch('client.GithubOrgClient.org',
+        with patch("client.GithubOrgClient.org",
                    new_callable=PropertyMock) as mock:
             payload = {"repos_url": "World"}
             mock.return_value = payload
-            test_class = GithubOrgClient('test')
+            test_class = GithubOrgClient("test")
             result = test_class._public_repos_url
             self.assertEqual(result, payload["repos_url"])
 
-    @patch('client.get_json')
+    @patch("client.get_json")
     def test_public_repos(self, mock_json):
-        """
-        Test that the list of repos is what you expect from the chosen payload.
-        Test that the mocked property and the mocked get_json was called once.
+        """Test that the list of repos is what you expect from the chosen
+        payload. Test that the mocked property and the mocked get_json
+          was called once.
         """
         json_payload = [{"name": "Google"}, {"name": "Twitter"}]
         mock_json.return_value = json_payload
 
-        with patch('client.GithubOrgClient._public_repos_url',
-                   new_callable=PropertyMock) as mock_public:
-
+        with patch(
+            "client.GithubOrgClient._public_repos_url",
+            new_callable=PropertyMock
+        ) as mock_public:
             mock_public.return_value = "hello/world"
-            test_class = GithubOrgClient('test')
+            test_class = GithubOrgClient("test")
             result = test_class.public_repos()
 
             check = [i["name"] for i in json_payload]
@@ -57,12 +55,14 @@ class TestGithubOrgClient(unittest.TestCase):
             mock_public.assert_called_once()
             mock_json.assert_called_once()
 
-    @parameterized.expand([
-        ({"license": {"key": "my_license"}}, "my_license", True),
-        ({"license": {"key": "other_license"}}, "my_license", False)
-    ])
+    @parameterized.expand(
+        [
+            ({"license": {"key": "my_license"}}, "my_license", True),
+            ({"license": {"key": "other_license"}}, "my_license", False),
+        ]
+    )
     def test_has_license(self, repo, license_key, expected):
-        """ unit-test for GithubOrgClient.has_license """
+        """Unit-test for GithubOrgClient.has_license"""
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
 
@@ -72,30 +72,27 @@ class TestGithubOrgClient(unittest.TestCase):
     TEST_PAYLOAD
 )
 class TestIntegrationGithubOrgClient(unittest.TestCase):
-    """ Class for Integration test of fixtures """
+    """Class for Integration tests of GithubOrgClient"""
 
     @classmethod
     def setUpClass(cls):
-        """A class method called before tests in an individual class are run"""
-        # def my_side_effect(url):
-        #     """ Side Effect function for test """
-        #     test_url = "https://api.github.com/orgs/google"
-        #     if url == test_url:
-        #         return cls.org_payload
-        #     return cls.repos_payload
-
-        config = {'return_value.json.side_effect':
-                  [
-                      cls.org_payload, cls.repos_payload,
-                      cls.org_payload, cls.repos_payload
-                  ]
-                  }
-        cls.get_patcher = patch('requests.get', **config)
+        """A class method called before tests in an individual
+        class are run
+        """
+        config = {
+            "return_value.json.side_effect": [
+                cls.org_payload,
+                cls.repos_payload,
+                cls.org_payload,
+                cls.repos_payload,
+            ]
+        }
+        cls.get_patcher = patch("requests.get", **config)
 
         cls.mock = cls.get_patcher.start()
 
     def test_public_repos(self):
-        """ Integration test: public repos"""
+        """Integration test: public repos"""
         test_class = GithubOrgClient("google")
 
         self.assertEqual(test_class.org, self.org_payload)
@@ -105,16 +102,17 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         self.mock.assert_called()
 
     def test_public_repos_with_license(self):
-        """ Integration test for public repos with License """
+        """Integration test: public repos with license"""
         test_class = GithubOrgClient("google")
 
         self.assertEqual(test_class.public_repos(), self.expected_repos)
         self.assertEqual(test_class.public_repos("XLICENSE"), [])
-        self.assertEqual(test_class.public_repos(
-            "apache-2.0"), self.apache2_repos)
+        self.assertEqual(test_class.public_repos("apache-2.0"),
+                         self.apache2_repos)
         self.mock.assert_called()
 
     @classmethod
     def tearDownClass(cls):
-        """A class method called after tests in an individual class have run"""
+        """A class method called after tests in an individual
+        class have run"""
         cls.get_patcher.stop()
