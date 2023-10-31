@@ -11,19 +11,18 @@ import fixtures
 
 
 class TestGithubOrgClient(unittest.TestCase):
-    @parameterized.expand([("google"), ("abc")])
-    @patch("client.get_json", return_value={"payload": True})
-    def test_org(self, org_name, mock_get_json):
-        """
-        Test function for `GithubOrgClient.org`. It asserts if the function
-          returns
-        the expected output for given inputs and checks if the decorated method
-        is called only once.
-        """
+    """ Class for Testing Github Org Client """
 
-        test_class_instance = GithubOrgClient(org_name)
-        self.assertEqual(test_class_instance.org, {"payload": True})
-        mock_get_json.assert_called_once()
+    @parameterized.expand([
+        ('google'),
+        ('abc')
+    ])
+    @patch('client.get_json')
+    def test_org(self, input, mock):
+        """Test that GithubOrgClient.org returns the correct value"""
+        test_class = GithubOrgClient(input)
+        test_class.org()
+        mock.assert_called_once_with(f'https://api.github.com/orgs/{input}')
 
     @patch.object(GithubOrgClient, "org", new_callable=PropertyMock)
     def test_public_repos_url(self, mock_org):
